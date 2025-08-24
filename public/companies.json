@@ -1,0 +1,186 @@
+[
+  {
+    "id": "1",
+    "name": "Arya",
+    "founded": 2013,
+    "founders": [
+      "Vinay Kumar Sankarapu",
+      "Deekshith Marla"
+    ],
+    "website": "https://arya.ai/",
+    "category": "Financial Services",
+    "tags": ["Compliance & Analytics", "AI/ML"],
+    "country": "India",
+    "state": "Maharashtra",
+    "city": "Mumbai",
+    "logoUrl": "https://media.licdn.com/dms/image/v2/D560BAQGumQMAdu2eKg/company-logo_200_200/company-logo_200_200/0/1726641379517/arya_ai_logo?e=1756339200&v=beta&t=YzXT6pBiQTUbXM2HPQYGq7ND6Z85hy4OLYBR92vEZl0",
+    "description": "Develops AI platforms for deep learning applications in financial services and other industries.",
+    "linkedinProfile": "https://in.linkedin.com/company/arya-ai"
+  },
+  {
+    "id": "2",
+    "name": "Haptik",
+    "founded": 2013,
+    "founders": [
+      "Aakrit Vaish",
+      "Swapan Rajdev"
+    ],
+    "website": "https://www.haptik.ai/",
+    "category": "Marketing, Sales & Customer Engagement",
+    "tags": ["Marketing", "Sales", "Customer Engagement"],
+    "country": "US",
+    "state": "New York",
+    "city": "New York",
+    "logoUrl": "https://media.licdn.com/dms/image/v2/D4D0BAQGUa9QJ_H3DPw/company-logo_200_200/company-logo_200_200/0/1706535353641/haptik_inc_logo?e=1756339200&v=beta&t=E-psSLBGfAJ0EDZ3LvgKZET5Ss2enr2ybzJ1sIqc8yc",
+    "description": "Provides enterprise conversational AI platforms for customer engagement.",
+    "linkedinProfile": "https://www.linkedin.com/company/haptik-inc/"
+  },
+  {
+    "id": "3",
+    "name": "Avaamo",
+    "founded": 2014,
+    "founders": [
+      "Ram Menon",
+      "Sriram Chakravarthy"
+    ],
+    "website": "https://avaamo.ai/",
+    "category": "Language, Communication & Voice",
+    "tags": ["Language", "Communication", "Voice"],
+    "country": "US",
+    "state": "California",
+    "city": "Los Altos",
+    "logoUrl": "https://media.licdn.com/dms/image/v2/C560BAQG9IN7sin-fvg/company-logo_200_200/company-logo_200_200/0/1658503507819/avaamo_logo?e=1756339200&v=beta&t=f199Ls4OcNvrzoqYbz2MmIT0-e6zjJbM6FJ7a4ejIic",
+    "description": "AI-driven conversational platform designed for enterprises to automate customer service and support",
+    "linkedinProfile": "https://www.linkedin.com/company/avaamo/"
+  },
+  {
+    "id": "4",
+    "name": "Orbo",
+    "founded": 2016,
+    "founders": [
+      "Manoj Shinde",
+      "Abhit Sinha",
+      "Danish Jamil"
+    ],
+    "website": "https://www.orbo.ai/",
+    "category": "Industry, Robotics, and IoT",
+    "tags": ["Industry", "Robotics", "IoT"],
+    "country": "India",
+    "state": "Maharashtra",
+    "city": "Mumbai",
+    "logoUrl": "https://media.licdn.com/dms/image/v2/D4D0BAQEIrFQoJwp8-g/company-logo_200_200/company-logo_200_200/0/1689258485720/orbo_logo?e=1756339200&v=beta&t=U8qtNCsD9CYzBR9Rn6stFy8JDpCz9MgN5QrdDeEH0v0",
+    "description": "AI and computer vision-based platform focused on image enhancement and automation. Offering AI-powered tools for beauty brands to increase loyalty, stickiness, and conversions.",
+    "linkedinProfile": "https://in.linkedin.com/company/orbo"
+  },
+  {
+    "id": "5",
+    "name": "Clodura",
+    "founded": 2015,
+    "founders": [
+      "Kapil Khangaonkar",
+      "Abhay Nawathey"
+    ],
+    "website": "https://www.clodura.ai/",
+    "category": "Marketing, Sales & Customer Engagement",
+    "tags": ["Marketing", "Sales", "Customer Engagement"],
+    "country": "India",
+    "state": "Maharashtra",
+    "city": "Pune",
+    "logoUrl": "https://media.licdn.com/dms/image/v2/D560BAQGoYf_HcesX6w/company-logo_200_200/company-logo_200_200/0/1719256970473/clodura_systems_logo?e=1756339200&v=beta&t=sZroleLMlx4R055ak28O9ovfjm1PbX6K5A50QZZ_uNY",
+    "description": "AI-powered sales prospecting and engagement platform that helps sales professionals find decision-makers, gather actionable sales intelligence, automate outreach campaigns, and create a 10X sales pipeline.",
+    "linkedinProfile": "https://www.linkedin.com/company/clodura-systems"
+  },
+  {
+    "id": "6",
+    "name": "Eightfold",
+    "founded": 2016,
+    "founders": [
+      "Ashutosh Garg",
+      "Varun Kacholia"
+    ],
+    "website": "https://eightfold.ai/",
+    "category": "Recruitment, HR, Training & EdTech",
+    "tags": ["Recruitment", "HR", "Training", "EdTech"],
+    "country": "US",
+    "state": "California",
+    "city": "Santa Clara",
+    "logoUrl": "https://media.licdn.com/dms/image/v2/C560BAQHLTOYVPODAiw/company-logo_200_200/company-logo_200_200/0/1657566218475/eightfoldai_logo?e=1756339200&v=beta&t=dowlNCLpDSKIlGBEqi-6g4KAJxeSNPMmNjrD8yazOvM",
+    "description": "Offers AI-driven talent intelligence platforms for recruitment and workforce management.",
+    "linkedinProfile": "https://www.linkedin.com/company/eightfoldai/"
+  },
+  {
+    "id": "7",
+    "name": "Qure",
+    "founded": 2016,
+    "founders": [
+      "Prashant Warier",
+      "Dr. Pooja Rao"
+    ],
+    "website": "https://www.qure.ai/",
+    "category": "Healthcare & Medical Diagnostics",
+    "tags": ["Healthcare", "Medical Diagnostics"],
+    "country": "US",
+    "state": "New York",
+    "city": "New York",
+    "logoUrl": "https://media.licdn.com/dms/image/v2/D560BAQHcGu2e7g-IiA/company-logo_200_200/B56ZfA066oH8AU-/0/1751286788512?e=1756339200&v=beta&t=3liF-M0-osfhYJe6vjm59-E5vb12MEmbR60aPIM-CxU",
+    "description": "Develops AI-powered diagnostic tools for interpreting radiology scans.",
+    "linkedinProfile": "https://www.linkedin.com/company/qure.ai/"
+  },
+  {
+    "id": "8",
+    "name": "Entropik",
+    "founded": 2016,
+    "founders": [
+      "Ranjan Kumar",
+      "Lava Kumar",
+      "Bharat Shekhawat"
+    ],
+    "website": "https://www.entropik.io/",
+    "category": "Marketing, Sales & Customer Engagement",
+    "tags": ["Marketing", "Sales", "Customer Engagement"],
+    "country": "US",
+    "state": "Virginia",
+    "city": "Falls Church",
+    "logoUrl": "https://media.licdn.com/dms/image/v2/D560BAQFPmULVyRjkQA/company-logo_200_200/company-logo_200_200/0/1704264161574/entropiktech_logo?e=1756339200&v=beta&t=d5G_W8FZyaXPPsljpiEYRG3Ex7LIXuk0b4Uo69ZxiCI",
+    "description": "AI-powered integrated market research platform that uses Emotion AI to capture and analyze consumer responses.",
+    "linkedinProfile": "https://in.linkedin.com/company/entropiktech"
+  },
+  {
+    "id": "9",
+    "name": "Corover",
+    "founded": 2016,
+    "founders": [
+      "Ankush Sabharwal",
+      "Manav Gandotra",
+      "Kunal Bhakhri",
+      "Rahul Ranjan"
+    ],
+    "website": "https://corover.ai/",
+    "category": "Customer Service & Engagement",
+    "tags": ["Customer Service", "Engagement"],
+    "country": "India",
+    "state": "Karnataka",
+    "city": "Bangalore",
+    "logoUrl": "https://media.licdn.com/dms/image/v2/D4D0BAQG6pENiH6-8_A/company-logo_200_200/company-logo_200_200/0/1692615667034/corover_logo?e=1756339200&v=beta&t=UTKITynxMUltp_apDQ0jDHZEFjo2IvkO69819UZWHm4",
+    "description": "Provides multilingual conversational AI bots for customer engagement across sectors",
+    "linkedinProfile": "https://www.linkedin.com/company/corover/"
+  },
+  {
+    "id": "10",
+    "name": "Gnani",
+    "founded": 2016,
+    "founders": [
+      "Ganesh Gopalan",
+      "Ananth Nagaraj"
+    ],
+    "website": "https://www.gnani.ai/",
+    "category": "Customer Service & Engagement",
+    "tags": ["Customer Service", "Engagement"],
+    "country": "India",
+    "state": "Karnataka",
+    "city": "Bangalore",
+    "logoUrl": "https://media.licdn.com/dms/image/v2/D560BAQFJhZPEmiqlVQ/company-logo_200_200/B56ZXM_V5LHQAQ-/0/1742900913067/gnani_ai_logo?e=1756339200&v=beta&t=IXWZh3tknw3QGGykeTODOwQCkmbap8ELDch64Cew0PY",
+    "description": "Delivers voice-first conversational AI solutions in 40+ languages for enterprise automation.",
+    "linkedinProfile": "https://www.linkedin.com/company/gnani-ai/"
+  }
+]
