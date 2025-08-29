@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { X, User, ExternalLink } from 'lucide-react';
+import { X, User, ExternalLink, Edit3 } from 'lucide-react';
 import { Company } from '../types/company';
 
 interface CompanySidebarProps {
   company: Company | null;
   isOpen: boolean;
   onClose: () => void;
+  onEditCompany: (company: Company) => void;
 }
 
-const CompanySidebar: React.FC<CompanySidebarProps> = ({ company, isOpen, onClose }) => {
+const CompanySidebar: React.FC<CompanySidebarProps> = ({ company, isOpen, onClose, onEditCompany }) => {
   const [logoError, setLogoError] = useState(false);
   
   if (!company) return null;
@@ -77,16 +78,16 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ company, isOpen, onClos
       )}
       
       {/* Sidebar */}
-      <div className={`fixed top-0 right-0 h-full w-full max-w-lg bg-gray-900/95 backdrop-blur-xl border-l border-gray-700/60 z-50 transform transition-transform duration-500 ease-out shadow-2xl ${
+      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-gray-900/95 backdrop-blur-xl border-l border-gray-700/60 z-50 transform transition-all duration-500 ease-out shadow-2xl ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}>
+      } ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
         
         {/* Header with gradient */}
         <div className={`relative bg-gradient-to-r ${getCategoryGradient([company.category])} p-6 shadow-lg`}>
           <div className="absolute inset-0 bg-black/30"></div>
           
           <div className="relative flex items-start justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 flex-1 mr-4">
               <div className="relative flex-shrink-0">
                 <div className={`absolute inset-0 bg-gradient-to-r ${getCategoryGradient([company.category])} rounded-xl blur-lg opacity-70`}></div>
                 <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-white shadow-2xl">
@@ -120,17 +121,29 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ company, isOpen, onClos
               </div>
             </div>
             
-            <button
-              onClick={onClose}
-              className="w-10 h-10 bg-white/10 backdrop-blur-sm hover:bg-white/20 rounded-lg flex items-center justify-center text-white/80 hover:text-white transition-all duration-200 border border-white/20 hover:scale-110 active:scale-95"
-            >
-              <X className="h-5 w-5" />
-            </button>
+            <div className="flex items-center space-x-3">
+              {/* Edit Info Button */}
+              <button
+                onClick={() => onEditCompany(company)}
+                className="group flex items-center space-x-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 hover:border-white/30 text-white/90 hover:text-white transition-all duration-200 text-sm font-medium backdrop-blur-sm"
+              >
+                <Edit3 className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                <span>Edit Info</span>
+              </button>
+              
+              {/* Close Button */}
+              <button
+                onClick={onClose}
+                className="w-10 h-10 bg-white/10 backdrop-blur-sm hover:bg-white/20 rounded-lg flex items-center justify-center text-white/80 hover:text-white transition-all duration-200 border border-white/20 hover:scale-110 active:scale-95"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </div>
         
         {/* Content */}
-        <div className="p-6 space-y-8">
+        <div className="p-6 space-y-8 overflow-y-auto" style={{ height: 'calc(100vh - 140px)' }}>
           
           {/* Description */}
           <p className="text-gray-200 text-xl leading-relaxed font-light">
@@ -139,12 +152,13 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ company, isOpen, onClos
           
           {/* Founders */}
           <div>
-            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+            <h3 className="text-xl font-semibold text-white flex items-center mb-4">
               <div className="w-6 h-6 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center mr-3">
                 <User className="h-3 w-3 text-white" />
               </div>
               Founders
             </h3>
+            
             <div className="space-y-4">
               {company.founders.map((founder, index) => (
                 <div key={index} className="flex items-center space-x-4 p-3 rounded-lg bg-gray-800/30 border border-gray-700/30 hover:border-gray-600/50 transition-colors duration-200">

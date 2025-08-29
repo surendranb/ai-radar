@@ -1,9 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Send, Filter, Zap } from 'lucide-react';
+import { Send, Filter, Zap, AlertCircle, Plus } from 'lucide-react';
 import { Company } from '../types/company';
 import CompanyCard from './CompanyCard';
 import FilterSidebar from './FilterModal';
 import CompanySidebar from './CompanySidebar';
+import AddCompanySidebar from './AddCompanySidebar';
+import EditCompanySidebar from './EditCompanySidebar';
+import { useGeminiSearch } from '../hooks/useGeminiSearch';
 
 interface UnifiedViewProps {
   companies: Company[];
@@ -20,6 +23,11 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showAddCompanySidebar, setShowAddCompanySidebar] = useState(false);
+  const [showEditCompanySidebar, setShowEditCompanySidebar] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
+  const { searchWithAI, isSearching, searchError } = useGeminiSearch();
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -29,37 +37,80 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const handleAIQuery = () => {
+  const handleAIQuery = async () => {
     if (!chatInput.trim()) return;
-    setIsTyping(true);
     
-    setTimeout(() => {
-      const lowerQuery = chatInput.toLowerCase();
+    console.log('🚀 Starting AI query:', chatInput);
+    setIsTyping(true);
+    setHasSearched(true);
+    
+    const availableData = {
+      categories,
+      locations: Array.from(new Set(companies.map(c => `${c.city}, ${c.state}, ${c.country}`))).sort(),
+      companies: companies.map(c => ({
+        id: c.id,
+        name: c.name,
+        category: c.category,
+        tags: c.tags,
+        description: c.description,
+        country: c.country,
+        state: c.state,
+        city: c.city,
+        founded: c.founded
+      }))
+    };
+
+    console.log('📋 Available data for search:', availableData);
+
+    try {
+      const filters = await searchWithAI(chatInput, availableData);
       
-      setSelectedCategories([]);
-      setSelectedCountries([]);
-      setSelectedStates([]);
-
-      if (lowerQuery.includes('financial') || lowerQuery.includes('fintech')) {
-        setSelectedCategories(['Financial Services']);
-      } else if (lowerQuery.includes('healthcare') || lowerQuery.includes('health')) {
-        setSelectedCategories(['Healthcare']);
-      } else if (lowerQuery.includes('edtech') || lowerQuery.includes('education')) {
-        setSelectedCategories(['EdTech']);
-      } else if (lowerQuery.includes('cybersecurity') || lowerQuery.includes('security')) {
-        setSelectedCategories(['Cybersecurity']);
-      } else if (lowerQuery.includes('ai') || lowerQuery.includes('ml') || lowerQuery.includes('artificial intelligence')) {
-        setSelectedCategories(['AI/ML']);
-      } else if (lowerQuery.includes('compliance') || lowerQuery.includes('analytics')) {
-        setSelectedCategories(['Compliance & Analytics']);
+      console.log('🎯 Received filters from AI:', JSON.stringify(filters, null, 2));
+      
+      if (filters) {
+        // Apply the AI-generated filters
+        console.log('✅ Applying filters:', JSON.stringify({
+          categories: filters.categories,
+          countries: filters.countries,
+          states: filters.states,
+          yearRange: filters.foundedYearRange
+        }, null, 2));
+        
+        setSelectedCategories(filters.categories);
+        setSelectedCountries(filters.countries);
+        setSelectedStates(filters.states);
+        
+        // Apply year range if specified
+        if (filters.foundedYearRange) {
+          setFoundedYearRange(filters.foundedYearRange);
+        }
+        
+        console.log('✅ Filters applied successfully');
+      } else {
+        console.error('❌ No filters returned from AI search');
       }
-
+    } catch (error) {
+      console.error('💥 AI search failed:', error);
+      // Don't clear filters on error, keep the search state
+      // This will show "No Results Found" message
+    } finally {
+      console.log('🏁 AI search completed');
       setChatInput('');
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const filteredCompanies = useMemo(() => {
+    // If user has searched but all filters are empty, show no results
+    if (hasSearched && 
+        selectedCategories.length === 0 && 
+        selectedCountries.length === 0 && 
+        selectedStates.length === 0 &&
+        foundedYearRange[0] === 2010 && 
+        foundedYearRange[1] === 2025) {
+      return [];
+    }
+    
     return companies.filter(company => {
       const matchesCategory = selectedCategories.length === 0 ||
                              selectedCategories.some(selectedCat =>
@@ -78,7 +129,7 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
       
       return matchesCategory && matchesCountry && matchesState && matchesFoundedYear;
     });
-  }, [companies, selectedCategories, selectedCountries, selectedStates, foundedYearRange]);
+  }, [companies, selectedCategories, selectedCountries, selectedStates, foundedYearRange, hasSearched]);
 
   const categories = useMemo(() => 
     Array.from(new Set(companies.flatMap(c => [c.category, ...c.tags]))).sort(), [companies]
@@ -93,15 +144,31 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
   );
 
   const handleCompanySelect = (company: Company) => {
+    // Ensure smooth animation by setting company first, then opening
     setSelectedCompany(company);
-    setIsSidebarOpen(true);
+    // Small delay to ensure company data is set before animation starts
+    setTimeout(() => {
+      setIsSidebarOpen(true);
+    }, 10);
   };
 
   const handleCloseSidebar = () => {
     setIsSidebarOpen(false);
-    setTimeout(() => setSelectedCompany(null), 300); // Wait for animation
+    // Wait for animation to complete before clearing company data
+    setTimeout(() => setSelectedCompany(null), 500);
   };
 
+  const handleEditCompany = (company: Company) => {
+    setEditingCompany(company);
+    setShowEditCompanySidebar(true);
+    // Close the company sidebar
+    setIsSidebarOpen(false);
+  };
+
+  const handleCloseEditSidebar = () => {
+    setShowEditCompanySidebar(false);
+    setTimeout(() => setEditingCompany(null), 300); // Wait for animation
+  };
   const activeFiltersCount = selectedCategories.length + selectedCountries.length + selectedStates.length;
 
   return (
@@ -144,27 +211,42 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
         <div className="text-center mb-16">
           {/* Filter moved to top right */}
           <div className="absolute top-6 right-6">
-            <button
-              onClick={() => setShowFilterSidebar(true)}
-              className={`group relative px-4 py-2.5 rounded-xl border transition-all duration-500 backdrop-blur-sm ${
-                activeFiltersCount > 0
-                  ? 'bg-emerald-500/20 border-emerald-400/60 text-emerald-300 shadow-lg shadow-emerald-500/20' 
-                  : 'bg-gray-800/40 border-gray-600/40 text-gray-300 hover:border-gray-500/60 hover:bg-gray-800/60'
-              }`}
-            >
-              <div className="flex items-center space-x-2">
-                <Filter className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
-                <span className="font-medium text-sm">Filters</span>
-                {activeFiltersCount > 0 && (
-                  <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 text-black text-xs px-2 py-0.5 rounded-full font-bold animate-pulse">
-                    {activeFiltersCount}
-                  </span>
-                )}
-              </div>
-              {activeFiltersCount > 0 && (
+            <div className="flex items-center space-x-3">
+              {/* Add Company Button */}
+              <button
+                onClick={() => setShowAddCompanySidebar(true)}
+                className="group relative px-4 py-2.5 rounded-xl border transition-all duration-500 backdrop-blur-sm bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border-emerald-400/60 text-emerald-300 hover:from-emerald-500/30 hover:to-cyan-500/30 hover:border-emerald-400/80 shadow-lg shadow-emerald-500/20"
+              >
+                <div className="flex items-center space-x-2">
+                  <Plus className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                  <span className="font-medium text-sm">Add Company</span>
+                </div>
                 <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400/30 to-cyan-500/30 rounded-xl blur opacity-60 group-hover:opacity-80 transition duration-300"></div>
-              )}
-            </button>
+              </button>
+
+              {/* Filters Button */}
+              <button
+                onClick={() => setShowFilterSidebar(true)}
+                className={`group relative px-4 py-2.5 rounded-xl border transition-all duration-500 backdrop-blur-sm ${
+                  activeFiltersCount > 0
+                    ? 'bg-emerald-500/20 border-emerald-400/60 text-emerald-300 shadow-lg shadow-emerald-500/20' 
+                    : 'bg-gray-800/40 border-gray-600/40 text-gray-300 hover:border-gray-500/60 hover:bg-gray-800/60'
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <Filter className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                  <span className="font-medium text-sm">Filters</span>
+                  {activeFiltersCount > 0 && (
+                    <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 text-black text-xs px-2 py-0.5 rounded-full font-bold animate-pulse">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </div>
+                {activeFiltersCount > 0 && (
+                  <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400/30 to-cyan-500/30 rounded-xl blur opacity-60 group-hover:opacity-80 transition duration-300"></div>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Sophisticated Typography */}
@@ -190,21 +272,32 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
                     <textarea
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleAIQuery())}
+                      onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && !isSearching && (e.preventDefault(), handleAIQuery())}
                       placeholder="Ask me anything... 'Show me financial services companies' or 'Find companies in India'"
-                      className="w-full bg-transparent text-white placeholder-gray-400 text-xl resize-none focus:outline-none h-16 leading-relaxed font-light transition-all duration-200 focus:placeholder-gray-500"
+                      className="w-full bg-transparent text-white placeholder-gray-400 text-xl resize-none focus:outline-none h-16 leading-relaxed font-light transition-all duration-200 focus:placeholder-gray-500 disabled:opacity-50"
                       rows={2}
+                      disabled={isSearching}
                     />
                     
                     {/* Typing indicator */}
-                    {isTyping && (
+                    {(isSearching || isTyping) && (
                       <div className="absolute bottom-2 left-0 flex items-center space-x-3">
                         <div className="flex space-x-1">
                           <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce shadow-lg shadow-emerald-400/50"></div>
                           <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce shadow-lg shadow-cyan-400/50" style={{ animationDelay: '0.1s' }}></div>
                           <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce shadow-lg shadow-purple-400/50" style={{ animationDelay: '0.2s' }}></div>
                         </div>
-                        <span className="text-sm text-gray-400 font-light">Neural processing...</span>
+                        <span className="text-sm text-gray-400 font-light">
+                          {isSearching ? 'AI analyzing...' : 'Processing...'}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {/* Error indicator */}
+                    {searchError && (
+                      <div className="absolute bottom-2 left-0 flex items-center space-x-2 text-red-400">
+                        <AlertCircle className="h-4 w-4" />
+                        <span className="text-sm">Search failed, using fallback</span>
                       </div>
                     )}
                   </div>
@@ -212,13 +305,17 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
                   {/* Premium send button */}
                   <button
                     onClick={handleAIQuery}
-                    disabled={!chatInput.trim() || isTyping}
+                    disabled={!chatInput.trim() || isSearching || isTyping}
                     className="relative group/btn w-14 h-14 rounded-xl overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-110 active:scale-95"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-cyan-600 opacity-90 group-hover/btn:opacity-100 transition-opacity shadow-lg shadow-emerald-500/30"></div>
                     <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-cyan-500 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200"></div>
                     <div className="relative flex items-center justify-center h-full">
-                      <Send className="h-5 w-5 text-white group-hover/btn:scale-110 group-hover/btn:rotate-12 transition-transform duration-200" />
+                      {isSearching ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <Send className="h-5 w-5 text-white group-hover/btn:scale-110 group-hover/btn:rotate-12 transition-transform duration-200" />
+                      )}
                     </div>
                     <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400/50 to-cyan-500/50 rounded-xl blur opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
                   </button>
@@ -229,32 +326,82 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
         </div>
 
         {/* Results Counter */}
-        {(selectedCategories.length > 0 || selectedCountries.length > 0 || selectedStates.length > 0) && (
+        {hasSearched && (
           <div className="text-center mb-8">
-            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gray-800/40 border border-gray-600/40 backdrop-blur-sm animate-fade-in">
-              <Zap className="h-4 w-4 text-emerald-400 animate-pulse" />
-              <span className="text-gray-300 font-light">
-                Found <span className="text-emerald-400 font-semibold animate-pulse">{filteredCompanies.length}</span> companies
-              </span>
-            </div>
+            {filteredCompanies.length > 0 ? (
+              <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gray-800/40 border border-gray-600/40 backdrop-blur-sm animate-fade-in">
+                <Zap className="h-4 w-4 text-emerald-400 animate-pulse" />
+                <span className="text-gray-300 font-light">
+                  Found <span className="text-emerald-400 font-semibold animate-pulse">{filteredCompanies.length}</span> companies
+                </span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-red-800/40 border border-red-600/40 backdrop-blur-sm animate-fade-in">
+                <AlertCircle className="h-4 w-4 text-red-400" />
+                <span className="text-gray-300 font-light">
+                  No companies match your search
+                </span>
+              </div>
+            )}
           </div>
         )}
 
         {/* Company Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredCompanies.map((company, index) => (
-            <div
-              key={company.id}
-              className="animate-fade-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <CompanyCard 
-                company={company} 
-                onCompanySelect={handleCompanySelect}
-              />
+        {filteredCompanies.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredCompanies.map((company, index) => (
+              <div
+                key={company.id}
+                className="animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <CompanyCard 
+                  company={company} 
+                  onCompanySelect={handleCompanySelect}
+                />
+              </div>
+            ))}
+          </div>
+        ) : hasSearched ? (
+          <div className="text-center py-16">
+            <div className="max-w-md mx-auto">
+              <div className="w-16 h-16 bg-gray-800/60 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertCircle className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-300 mb-3">No Results Found</h3>
+              <p className="text-gray-400 mb-6">
+                Try adjusting your search terms or browse all companies by clearing the search.
+              </p>
+              <button
+                onClick={() => {
+                  setHasSearched(false);
+                  setSelectedCategories([]);
+                  setSelectedCountries([]);
+                  setSelectedStates([]);
+                  setFoundedYearRange([2010, 2025]);
+                }}
+                className="px-6 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 hover:border-emerald-400/60 rounded-lg text-emerald-300 hover:text-emerald-200 transition-all duration-200 font-medium"
+              >
+                Show All Companies
+              </button>
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {companies.map((company, index) => (
+              <div
+                key={company.id}
+                className="animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <CompanyCard 
+                  company={company} 
+                  onCompanySelect={handleCompanySelect}
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Filter Sidebar */}
         <FilterSidebar
@@ -278,6 +425,20 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
           company={selectedCompany}
           isOpen={isSidebarOpen}
           onClose={handleCloseSidebar}
+          onEditCompany={handleEditCompany}
+        />
+        
+        {/* Add Company Sidebar */}
+        <AddCompanySidebar
+          isOpen={showAddCompanySidebar}
+          onClose={() => setShowAddCompanySidebar(false)}
+        />
+        
+        {/* Edit Company Sidebar */}
+        <EditCompanySidebar
+          company={editingCompany}
+          isOpen={showEditCompanySidebar}
+          onClose={handleCloseEditSidebar}
         />
       </div>
 

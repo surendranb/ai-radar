@@ -148,7 +148,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </div>
         
         {/* Content */}
-        <div className="p-4 space-y-4 h-full overflow-y-auto pb-20" onClick={(e) => e.stopPropagation()}>
+        <div className="p-4 space-y-4 overflow-y-auto" style={{ height: 'calc(100vh - 200px)', paddingBottom: '120px' }} onClick={(e) => e.stopPropagation()}>
           
           {/* Dynamic Pills Display - Shows all selected filters */}
           {totalFilters > 0 && (

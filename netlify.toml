@@ -1,0 +1,11 @@
+[[edge_functions]]
+function = "gemini-search"
+path = "/.netlify/functions/gemini-search"
+
+[[edge_functions]]
+function = "companies-proxy"
+path = "/.netlify/functions/companies-proxy"
+
+[build]
+command = "npx vite build"
+publish = "dist"
